@@ -1,0 +1,6 @@
+{
+  "name": "Classora",
+  "description": "Classora - Education and Communication platform for teachers and students.",
+  "requestFramePermissions": ["microphone", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

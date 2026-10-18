@@ -1,0 +1,192 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUser(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Users Collection
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isUser(uid);
+    }
+
+    // Teachers collection
+    match /teachers/{uid} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Students collection (for ID lookup and connections)
+    match /students/{uid} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Groups collection (Teachers create and manage, authorized students read)
+    match /groups/{groupId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Group Members collection (Teacher admins manage members)
+    match /groupMembers/{memberId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Classes collection (Teachers create, students and teachers read/update for joining/counts)
+    match /classes/{classId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Class Members collection (Students joining/leaving and Teachers managing)
+    match /classMembers/{memberId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Sessions collection (Teachers host, students update presentCount upon verification)
+    match /sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Attendance collection (Students submit attendance, teachers verify)
+    match /attendance/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // AI Student Reports (Only teacher and authorized user can access)
+    match /aiStudentReports/{reportId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // AI Outbound Calls
+    match /aiCalls/{callId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Connection Requests
+    match /connectionRequests/{requestId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Connections
+    match /connections/{connId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Conversations & Messages Subcollection
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+    }
+
+    // Top-level Messages (for legacy or direct queries)
+    match /messages/{messageId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // AI Conversations
+    match /aiConversations/{aiId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // AI Reports for teachers
+    match /aiReports/{reportId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Notifications
+    match /notifications/{notifId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Courses collection
+    match /courses/{courseId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+
+      match /materials/{materialId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+
+      match /students/{studentId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+
+      match /joinRequests/{studentId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+    }
+
+    // Global course members and join requests for direct querying
+    match /courseMembers/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    match /courseJoinRequests/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Real-Time WebRTC Calling collection
+    match /calls/{callId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+
+      match /callerCandidates/{candidateId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+
+      match /calleeCandidates/{candidateId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+    }
+
+    // English Learning Materials (All authenticated users read, authenticated teachers/users create & update)
+    match /englishMaterials/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Test connection doc
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
+
